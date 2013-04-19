@@ -1,6 +1,7 @@
 package collabsketch.demo;
 
 import collabsketch.CollabSketch;
+import collabsketch.CollabSketchLineContainer;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
@@ -15,12 +16,16 @@ import com.vaadin.ui.VerticalLayout;
 public class DemoUI extends UI
 {
 
+	static CollabSketchLineContainer lines = new CollabSketchLineContainer();
+	
     @Override
     protected void init(VaadinRequest request) {
     	
     	// Initialize our new UI component
-    	final CollabSketch collabsketch = new CollabSketch();
-            	
+    	final CollabSketch collabsketch = new CollabSketch(lines);
+
+		System.out.println("Demo application init");
+		
     	// Show it in the middle of the screen
     	final VerticalLayout layout = new VerticalLayout();
         layout.setStyleName("demoContentLayout");
@@ -28,7 +33,6 @@ public class DemoUI extends UI
         layout.addComponent(collabsketch);
         layout.setComponentAlignment(collabsketch, Alignment.MIDDLE_CENTER);
         setContent(layout);
-
     }
 
 }

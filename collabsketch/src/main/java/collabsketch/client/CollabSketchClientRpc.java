@@ -9,4 +9,6 @@ public interface CollabSketchClientRpc extends ClientRpc {
 	// Example API: Fire up alert box in client
 	public void alert(String message);
 
+	public void drawLine(DrawLine line);
+
 }

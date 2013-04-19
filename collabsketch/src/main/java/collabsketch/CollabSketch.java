@@ -1,39 +1,44 @@
 package collabsketch;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Vector;
+
 import collabsketch.client.CollabSketchClientRpc;
 import collabsketch.client.CollabSketchServerRpc;
 import collabsketch.client.CollabSketchState;
-
-import com.vaadin.shared.MouseEventDetails;
+import collabsketch.client.DrawLine;
+import collabsketch.client.DrawPoint;
 
 // This is the server-side UI component that provides public API 
 // for CollabSketch
 public class CollabSketch extends com.vaadin.ui.AbstractComponent {
 
-	private int clickCount = 0;
-
+	private CollabSketchLineContainer lineContainer;
+	
+	int linesAtClient = 0;
+	
 	// To process events from the client, we implement ServerRpc
 	private CollabSketchServerRpc rpc = new CollabSketchServerRpc() {
 
-		// Event received from client - user clicked our widget
-		public void clicked(MouseEventDetails mouseDetails) {
-			
-			// Send nag message every 5:th click with ClientRpc
-			if (++clickCount % 5 == 0) {
-				getRpcProxy(CollabSketchClientRpc.class)
-						.alert("Ok, that's enough!");
-			}
-			
-			// Update shared state. This state update is automatically 
-			// sent to the client. 
-			//getState().text = "You have clicked " + clickCount + " times";
+		@Override
+		public void drawingEnded(DrawLine line) {
+			lineContainer.getLines().add(line);
+			System.out.println("Line drawed!");
 		}
 	};
 
-	public CollabSketch() {
-
+	public CollabSketch(CollabSketchLineContainer lineContainer) {
+		setImmediate(true);
+		this.lineContainer = lineContainer;
 		// To receive events from the client, we register ServerRpc
 		registerRpc(rpc);
+		System.out.println("Collab component created!");
+		
+		System.out.println("Amount of lines " + lineContainer.getLines().size());
+		if (!lineContainer.getLines().isEmpty()) {
+			getState().lines = lineContainer.getLines();
+		}
 	}
 
 	// We must override getState() to cast the state to CollabSketchState

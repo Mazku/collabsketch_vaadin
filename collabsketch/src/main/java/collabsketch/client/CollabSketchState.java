@@ -1,8 +1,10 @@
 package collabsketch.client;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class CollabSketchState extends com.vaadin.shared.AbstractComponentState {
 
-	// State can have both public variable and bean properties
-	//public String text = "CollabSketch";
+	public ArrayList<DrawLine> lines = new ArrayList<DrawLine>();
 
 }
