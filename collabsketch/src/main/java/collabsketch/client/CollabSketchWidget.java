@@ -21,6 +21,9 @@ import com.google.gwt.user.client.ui.Widget;
 public class CollabSketchWidget extends VerticalPanel {
 
 	boolean mouseDown = false;
+	float last_x = 0;
+	float last_y = 0;
+	static final float dist_buffer = 7;
 	
 	public CollabSketchWidget() {
 		add(new Label("test"));
@@ -29,6 +32,8 @@ public class CollabSketchWidget extends VerticalPanel {
 		final Context2d context = canv.getContext2d();
 		canv.setWidth("800px");
 		canv.setHeight("800px");
+		canv.setCoordinateSpaceHeight(800);
+		canv.setCoordinateSpaceWidth(800);
 		add(canv);
 		
 		canv.addMouseDownHandler(new MouseDownHandler() {
@@ -37,10 +42,12 @@ public class CollabSketchWidget extends VerticalPanel {
 			public void onMouseDown(MouseDownEvent event) {
 				mouseDown = true;
 				float x = event.getClientX() - canv.getAbsoluteLeft();
-				float y = event.getClientX()  - canv.getAbsoluteTop();
+				float y = event.getClientY()  - canv.getAbsoluteTop();
 				context.beginPath();
 				context.setLineWidth(5);
 				context.moveTo(x, y);
+				last_x = x;
+				last_y = y;
 			}
 		});
 		
@@ -50,10 +57,15 @@ public class CollabSketchWidget extends VerticalPanel {
 			public void onMouseMove(MouseMoveEvent event) {
 				if (mouseDown) {
 					float x = event.getClientX() - canv.getAbsoluteLeft();
-					float y = event.getClientX() - canv.getAbsoluteTop();
-					System.out.println("x:" + x + " y:" + y);
-					context.lineTo(x, y);
-					context.moveTo(x, y);
+					float y = event.getClientY() - canv.getAbsoluteTop();
+					
+					if (getDistance(last_x, last_y, x, y) > dist_buffer) {
+						context.lineTo(x, y);
+						context.moveTo(x, y);
+						context.stroke();
+						last_x = x;
+						last_y = y;
+					}
 				}
 			}
 		});
@@ -65,7 +77,8 @@ public class CollabSketchWidget extends VerticalPanel {
 				if (mouseDown) {
 					mouseDown = false;
 					context.closePath();
-					context.stroke();
+					last_x = 0;
+					last_y = 0;
 				}
 			}
 		});
@@ -78,9 +91,15 @@ public class CollabSketchWidget extends VerticalPanel {
 					mouseDown = false;
 					context.closePath();
 					context.stroke();
+					last_x = 0;
+					last_y = 0;
 				}
 			}
 		});
+	}
+	
+	protected float getDistance(float x1, float y1, float x2, float y2) {
+		return (float) Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
 	}
 
 }
