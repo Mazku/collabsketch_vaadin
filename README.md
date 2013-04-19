@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # CollabSketch Add-on for Vaadin 7
 
 CollabSketch is an UI component add-on for Vaadin 7.
@@ -108,3 +109,9 @@ For a more comprehensive example, see src/test/java/org/vaadin/template/demo/Dem
 ## API
 
 CollabSketch JavaDoc is available online at <...>
+=======
+collabsketch_vaadin
+===================
+
+CollabSketch for Vaadin
+>>>>>>> 0d51d2ddee759eab1c87ddabb95aaf74906378e7
