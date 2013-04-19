@@ -8,7 +8,8 @@ import collabsketch.client.DrawPoint;
 
 public class DrawLine implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private ArrayList<DrawPoint> points = new ArrayList<DrawPoint>();
+	
+	public ArrayList<DrawPoint> points = new ArrayList<DrawPoint>();
 	
 	public DrawLine() {
 	}
@@ -23,13 +24,5 @@ public class DrawLine implements Serializable {
 
 	public void addPoints(ArrayList<DrawPoint> points) {
 		this.points.addAll(points);
-	}
-
-	public List<DrawPoint> getPoints() {
-		return points;
-	}
-	
-	public void setPoints(ArrayList<DrawPoint> points) {
-		this.points = points;
 	}
 }

@@ -31,6 +31,11 @@ public class CollabSketchConnector extends AbstractComponentConnector {
 			public void drawLine(DrawLine line) {
 				getWidget().drawLine(line);
 			}
+
+			@Override
+			public void updateState() {
+				updateLines();
+			}
 		});
 
 	}
@@ -59,7 +64,11 @@ public class CollabSketchConnector extends AbstractComponentConnector {
 	@Override
 	public void onStateChanged(StateChangeEvent stateChangeEvent) {
 		super.onStateChanged(stateChangeEvent);
-		
+		updateLines();
+	}
+	
+	protected void updateLines() {
+		GWT.log("Updating existing lines");
 		if (!getState().lines.isEmpty()) {
 			for (DrawLine line : getState().lines) {
 				getWidget().drawLine(line);

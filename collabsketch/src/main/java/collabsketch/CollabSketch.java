@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Vector;
 
+import com.vaadin.client.communication.RpcProxy;
+
 import collabsketch.client.CollabSketchClientRpc;
 import collabsketch.client.CollabSketchServerRpc;
 import collabsketch.client.CollabSketchState;
@@ -24,7 +26,7 @@ public class CollabSketch extends com.vaadin.ui.AbstractComponent {
 		@Override
 		public void drawingEnded(DrawLine line) {
 			lineContainer.getLines().add(line);
-			System.out.println("Line drawed!");
+			System.out.println("Line drawed with " + line.points.size() + " points!");
 		}
 	};
 
@@ -40,7 +42,7 @@ public class CollabSketch extends com.vaadin.ui.AbstractComponent {
 			getState().lines = lineContainer.getLines();
 		}
 	}
-
+	
 	// We must override getState() to cast the state to CollabSketchState
 	@Override
 	public CollabSketchState getState() {

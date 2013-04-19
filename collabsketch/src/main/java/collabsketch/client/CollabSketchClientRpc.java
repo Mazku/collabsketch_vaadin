@@ -11,4 +11,6 @@ public interface CollabSketchClientRpc extends ClientRpc {
 
 	public void drawLine(DrawLine line);
 
+	public void updateState();
+
 }
