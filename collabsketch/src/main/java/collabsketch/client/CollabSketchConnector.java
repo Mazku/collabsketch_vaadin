@@ -36,6 +36,11 @@ public class CollabSketchConnector extends AbstractComponentConnector {
 			public void updateState() {
 				updateLines();
 			}
+
+			@Override
+			public void clearCanvas() {
+				getWidget().clearCanvas();
+			}
 		});
 
 	}

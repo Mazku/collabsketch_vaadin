@@ -1,10 +1,5 @@
 package collabsketch;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Vector;
-
-import com.vaadin.client.communication.RpcProxy;
 
 import collabsketch.client.CollabSketchClientRpc;
 import collabsketch.client.CollabSketchServerRpc;
@@ -26,6 +21,9 @@ public class CollabSketch extends com.vaadin.ui.AbstractComponent {
 		@Override
 		public void drawingEnded(DrawLine line) {
 			lineContainer.getLines().add(line);
+			for(CollabSketchUpdateListener listener : lineContainer.getListeners()) {
+				listener.LineAdded(line);
+			}
 			System.out.println("Line drawed with " + line.points.size() + " points!");
 		}
 	};
@@ -41,11 +39,32 @@ public class CollabSketch extends com.vaadin.ui.AbstractComponent {
 		if (!lineContainer.getLines().isEmpty()) {
 			getState().lines = lineContainer.getLines();
 		}
+		
+		lineContainer.getListeners().add(new CollabSketchUpdateListener() {
+			
+			@Override
+			public void LineAdded(DrawLine line) {
+				getRpcProxy(CollabSketchClientRpc.class).drawLine(line);
+			}
+
+			@Override
+			public void canvasCleared() {
+				getRpcProxy(CollabSketchClientRpc.class).clearCanvas();
+			}
+		});
 	}
 	
 	// We must override getState() to cast the state to CollabSketchState
 	@Override
 	public CollabSketchState getState() {
 		return (CollabSketchState) super.getState();
+	}
+
+	public void clearCanvas() {
+		lineContainer.getLines().clear();
+		getState().lines.clear();
+		for (CollabSketchUpdateListener listener : lineContainer.getListeners()) {
+			listener.canvasCleared();
+		}
 	}
 }

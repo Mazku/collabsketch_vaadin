@@ -2,7 +2,6 @@ package collabsketch.client;
 
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
@@ -15,7 +14,6 @@ import com.google.gwt.event.dom.client.MouseOutEvent;
 import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseUpHandler;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 // Extend any GWT Widget
@@ -28,19 +26,17 @@ public class CollabSketchWidget extends VerticalPanel {
 	static final float dist_buffer = 7;
 	ArrayList<DrawPoint> points = new ArrayList<DrawPoint>();
 	final Canvas canv;
+	final Context2d context;
 	
 	public CollabSketchWidget() {
-		add(new Label("test"));
-		
-		
+
 		canv = Canvas.createIfSupported();
-		Context2d context = canv.getContext2d();
+		context = canv.getContext2d();
 		canv.setWidth("800px");
 		canv.setHeight("800px");
 		canv.setCoordinateSpaceHeight(800);
 		canv.setCoordinateSpaceWidth(800);
 		add(canv);
-		GWT.log("Canvas added with context " + context);
 		
 		canv.addMouseDownHandler(new MouseDownHandler() {
 			
@@ -109,6 +105,11 @@ public class CollabSketchWidget extends VerticalPanel {
 		GWT.log("Sending line to server with " + points.size() + " points.");
 		line.addPoints(points);
 		rpc.drawingEnded(line);
+		/*rpc.drawBegin(points.get(0));
+		for(DrawPoint point : points.subList(1, points.size() - 1)) {
+			rpc.drawPoint(point);
+		}
+		rpc.drawingEnd();*/
 		points.clear();
 		last_x = 0;
 		last_y = 0;
@@ -130,16 +131,21 @@ public class CollabSketchWidget extends VerticalPanel {
 		boolean first = true;
 		for(DrawPoint point : line.points) {
 			if (first) {
-				context.moveTo(point.getX(), point.getY());
+				context.moveTo(point.x, point.y);
 				first = false;
 			} else {
-				GWT.log("Adding point at " + point.getX() + ", " + point.getY());
-				context.lineTo(point.getX(), point.getY());
-				context.moveTo(point.getX(), point.getY());
+				GWT.log("Adding point at " + point.x + ", " + point.y);
+				context.lineTo(point.x, point.y);
+				context.moveTo(point.x, point.y);
 				context.stroke();
 			}
 		}
 		context.closePath();
+	}
+
+	public void clearCanvas() {
+		canv.setWidth("800px");
+		context.clearRect(0, 0, canv.getCoordinateSpaceWidth(), canv.getCoordinateSpaceHeight());
 	}
 
 }

@@ -13,4 +13,6 @@ public interface CollabSketchClientRpc extends ClientRpc {
 
 	public void updateState();
 
+	public void clearCanvas();
+
 }

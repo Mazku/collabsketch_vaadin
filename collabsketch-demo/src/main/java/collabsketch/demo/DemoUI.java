@@ -33,8 +33,16 @@ public class DemoUI extends UI
     	final VerticalLayout layout = new VerticalLayout();
         layout.setStyleName("demoContentLayout");
         layout.setSizeFull();
+        layout.addComponent(new Button("Reset canvas", new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				collabsketch.clearCanvas();
+			}
+		}));
         layout.addComponent(collabsketch);
-        layout.setComponentAlignment(collabsketch, Alignment.MIDDLE_CENTER);
+        layout.setExpandRatio(collabsketch, 1.0f);
+        //layout.setComponentAlignment(collabsketch, Alignment.MIDDLE_CENTER);
         setContent(layout);
     }
 
