@@ -14,6 +14,12 @@ import collabsketch.client.DrawPoint;
 // This is the server-side UI component that provides public API 
 // for CollabSketch
 public class CollabSketch extends com.vaadin.ui.AbstractComponent {
+	
+	final static private String[] colors = new String[] {
+		"800000", "ff0000", "0000ff", "f472d0", "f0a30a", "6a00ff", 
+		"76608a", "ffff00", "808000", "800080", "ff00ff", "00ff00", 
+		"008000", "000080", "00ffff", "008080", "a4c400", "ffa500"
+	};
 
 	final private CollabSketchLineContainer lineContainer;
 	
@@ -26,9 +32,16 @@ public class CollabSketch extends com.vaadin.ui.AbstractComponent {
 	private CollabSketchServerRpc rpc = new CollabSketchServerRpc() {
 
 		@Override
-		public void drawingEnded(DrawLine line) {
-			lineContainer.lineDrawed(listener, line);
-			lineContainer.getLines().add(line);
+		public void drawingEnded(final DrawLine line) {
+			Thread thread = new Thread(new Runnable() {
+				
+				@Override
+				public void run() {
+					lineContainer.lineDrawed(listener, line);
+					lineContainer.getLines().add(line);
+				}
+			});
+			thread.start();
 		}
 	};
 	
@@ -43,66 +56,28 @@ public class CollabSketch extends com.vaadin.ui.AbstractComponent {
 		getState().canvasWidth = width;
 		getState().canvasHeight = height;
 		
-		StringBuffer color = new StringBuffer();
-		int user = this.lineContainer.getListeners().size() + 1;
+		String color;
 		
 		sessionID = ui.getSession().getSession().getId();
 		if (lineContainer.getSessionColors().containsKey(sessionID)) {
-			color.append(lineContainer.getSessionColors().get(sessionID));
+			color = lineContainer.getSessionColors().get(sessionID);
 		} else {
-			if (user % 3 == 0) {
-				color.append("ff");
-			} else if (user % 2 == 0) {
-				String s = Integer.toHexString((user - (user % 3))*50);
-				if (s.length() == 1) {
-					s = "0"+s;
-				} else if (s.length() > 2) {
-					s = s.substring(0, 2);
-				}
-				color.append(s);
+			int user = this.lineContainer.getListeners().size();
+			if (user >= colors.length) {
+				color = colors[user % colors.length]; 
 			} else {
-				color.append("00");
+				color = colors[user];
 			}
-			
-			if (user % 3 == 0) {
-				color.append("00");
-			} else if (user % 2 == 0) {
-				color.append("ff");
-			} else {
-				String s = Integer.toHexString((user - (user % 3))*50);
-				if (s.length() == 1) {
-					s = "0"+s;
-				} else if (s.length() > 2) {
-					s = s.substring(0, 2);
-				}
-				color.append(s);
-			}
-			
-			if (user % 3 == 0) {
-				String s = Integer.toHexString((user - (user % 3))*50);
-				if (s.length() == 1) {
-					s = "0"+s;
-				} else if (s.length() > 2) {
-					s = s.substring(0, 2);
-				}
-				color.append(s);
-			} else if (user % 2 == 0) {
-				color.append("00");
-			} else {
-				color.append("ff");
-			}
-			
 			lineContainer.getSessionColors().put(sessionID, color.toString());
 		}
 		
 		
 		System.out.println("Color for the line " + color.toString());
-		getState().color = color.toString();
+		getState().color = color;
 		listener = new CollabSketchUpdateListener(ui) {
 				
 				@Override
 				public void lineAdded(final DrawLine line) {
-					System.out.println("Pushing line to widget " + CollabSketch.this.hashCode());
 					listener.getUi().runSafely(new Runnable() {
 						
 						@Override
@@ -133,7 +108,7 @@ public class CollabSketch extends com.vaadin.ui.AbstractComponent {
 			getState().lines = (ArrayList<DrawLine>) lineContainer.getLines();
 		}
 		
-		lineContainer.getListeners().add(listener);
+		lineContainer.getListeners().put(sessionID, listener);
 	}
 	
 	// We must override getState() to cast the state to CollabSketchState

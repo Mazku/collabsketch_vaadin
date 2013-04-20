@@ -14,14 +14,14 @@ public class CollabSketchLineContainer implements Serializable {
 
 	private List<DrawLine> drawedLines = new ArrayList<DrawLine>();
 	
-	private Set<CollabSketchUpdateListener> listeners = new HashSet<CollabSketchUpdateListener>();
+	private Map<String, CollabSketchUpdateListener> listeners = new HashMap<String, CollabSketchUpdateListener>();
 	private Map<String, String> sessionColors = new HashMap<String, String>();
 	
 	public List<DrawLine> getLines() {
 		return drawedLines;
 	}
 	
-	public Set<CollabSketchUpdateListener> getListeners() {
+	public Map<String, CollabSketchUpdateListener> getListeners() {
 		return listeners;
 	}
 	
@@ -30,7 +30,7 @@ public class CollabSketchLineContainer implements Serializable {
 	}
 	
 	public void canvasCleared(CollabSketchUpdateListener caller) {
-		for (CollabSketchUpdateListener listener : listeners) {
+		for (CollabSketchUpdateListener listener : listeners.values()) {
 			if (!listener.equals(caller)) {
 				listener.canvasCleared();
 			}
@@ -39,10 +39,8 @@ public class CollabSketchLineContainer implements Serializable {
 	
 	public void lineDrawed(CollabSketchUpdateListener caller, DrawLine line) {
 		System.out.println("Line drawed, calling " + listeners.size() + " listeners.");
-		for (CollabSketchUpdateListener listener : listeners) {
-			System.out.println("Comparing listeners " + caller.hashCode() + " to " + listener.hashCode());
+		for (CollabSketchUpdateListener listener : listeners.values()) {
 			if (!listener.equals(caller)) {
-				System.out.println("Calling lineAdded at listener " + listener.hashCode());
 				listener.lineAdded(line);
 			}
 		}

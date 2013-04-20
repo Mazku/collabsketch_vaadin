@@ -1,8 +1,8 @@
 package collabsketch.client;
 
 
-import java.awt.Window;
 import java.util.ArrayList;
+import java.util.Date;
 
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
@@ -16,8 +16,6 @@ import com.google.gwt.event.dom.client.MouseOutEvent;
 import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseUpHandler;
-import com.google.gwt.event.dom.client.TouchCancelEvent;
-import com.google.gwt.event.dom.client.TouchCancelHandler;
 import com.google.gwt.event.dom.client.TouchEndEvent;
 import com.google.gwt.event.dom.client.TouchEndHandler;
 import com.google.gwt.event.dom.client.TouchMoveEvent;
@@ -25,6 +23,7 @@ import com.google.gwt.event.dom.client.TouchMoveHandler;
 import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.uibinder.client.UiConstructor;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 // Extend any GWT Widget
@@ -35,11 +34,12 @@ public class CollabSketchWidget extends VerticalPanel {
 	float last_y = 0;
 	private CollabSketchServerRpc rpc;
 	static final float dist_buffer = 7;
+	static final int updateTime = 50;
 	ArrayList<DrawPoint> points = new ArrayList<DrawPoint>();
 	final Canvas canv;
-	final Context2d context;
 	String color;
 	int lines;
+	long lastUpdate;
 	
 	public @UiConstructor CollabSketchWidget(int width, int height, String color) {
 		this.color = color;
@@ -47,7 +47,6 @@ public class CollabSketchWidget extends VerticalPanel {
 		setSize(width + "px", height + "px");
 		
 		canv = Canvas.createIfSupported();
-		context = canv.getContext2d();
 		canv.setCoordinateSpaceWidth(width);
 		canv.setCoordinateSpaceHeight(height);
 		canv.setSize(width + "px", height + "px");
@@ -129,12 +128,8 @@ public class CollabSketchWidget extends VerticalPanel {
 	protected void startDrawing(int clientX, int clientY) {
 		Context2d context = canv.getContext2d();
 		drawing = true;
-		float x = clientX - canv.getAbsoluteLeft();
-		float y = clientY - canv.getAbsoluteTop();
-		context.beginPath();
-		context.setLineWidth(5);
-		context.setStrokeStyle(color);
-		context.moveTo(x, y);
+		float x = clientX - canv.getAbsoluteLeft() + Window.getScrollLeft();
+		float y = clientY - canv.getAbsoluteTop() + Window.getScrollTop();
 		points.add(new DrawPoint(x, y));
 		last_x = x;
 		last_y = y;
@@ -142,23 +137,30 @@ public class CollabSketchWidget extends VerticalPanel {
 	
 	private void continueDrawing(int clientX, int clientY) {
 		Context2d context = canv.getContext2d();
-		float x = clientX - canv.getAbsoluteLeft();
-		float y = clientY - canv.getAbsoluteTop();
+		float x = clientX - canv.getAbsoluteLeft() + Window.getScrollLeft();
+		float y = clientY - canv.getAbsoluteTop() + Window.getScrollTop();
 		
 		if (getDistance(last_x, last_y, x, y) > dist_buffer) {
+			context.beginPath();
+			context.setLineWidth(5);
+			context.setStrokeStyle(color);
+			context.moveTo(last_x, last_y);
 			context.lineTo(x, y);
 			context.moveTo(x, y);
-			points.add(new DrawPoint(x, y));
+			context.closePath();
 			context.stroke();
+			points.add(new DrawPoint(x, y));
 			last_x = x;
 			last_y = y;
+			if (lastUpdate + updateTime < new Date().getTime()) {
+				endDrawing();
+				startDrawing(clientX, clientY);
+			}
 		}
 	}
 	
 	protected void endDrawing() {
 		drawing = false;
-		Context2d context = canv.getContext2d();
-		context.closePath();
 		DrawLine line = new DrawLine();
 		GWT.log("Sending line to server with " + points.size() + " points.");
 		line.addPoints(points);
@@ -167,6 +169,7 @@ public class CollabSketchWidget extends VerticalPanel {
 		points.clear();
 		last_x = 0;
 		last_y = 0;
+		lastUpdate = new Date().getTime();
 		lines++;
 	}
 	
@@ -201,7 +204,7 @@ public class CollabSketchWidget extends VerticalPanel {
 	}
 
 	public void clearCanvas() {
-		context.clearRect(0, 0, canv.getCoordinateSpaceWidth(), canv.getCoordinateSpaceHeight());
+		canv.getContext2d().clearRect(0, 0, canv.getCoordinateSpaceWidth(), canv.getCoordinateSpaceHeight());
 	}
 
 	public void updateCanvasSize(int canvasWidth, int canvasHeight) {
