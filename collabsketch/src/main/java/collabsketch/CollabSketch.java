@@ -1,6 +1,8 @@
 package collabsketch;
 
 
+import java.util.ArrayList;
+
 import com.vaadin.ui.UI;
 
 import collabsketch.client.CollabSketchClientRpc;
@@ -17,6 +19,8 @@ public class CollabSketch extends com.vaadin.ui.AbstractComponent {
 	
 	final CollabSketchUpdateListener listener;
 	
+	final String sessionID; 
+	
 	
 	// To process events from the client, we implement ServerRpc
 	private CollabSketchServerRpc rpc = new CollabSketchServerRpc() {
@@ -25,7 +29,6 @@ public class CollabSketch extends com.vaadin.ui.AbstractComponent {
 		public void drawingEnded(DrawLine line) {
 			lineContainer.lineDrawed(listener, line);
 			lineContainer.getLines().add(line);
-			System.out.println("Line drawed with " + line.points.size() + " points and color of " + line.color);
 		}
 	};
 	
@@ -43,41 +46,55 @@ public class CollabSketch extends com.vaadin.ui.AbstractComponent {
 		StringBuffer color = new StringBuffer();
 		int user = this.lineContainer.getListeners().size() + 1;
 		
-		if (user % 3 == 0) {
-			color.append("ff");
-		} else if (user % 2 == 0) {
-			String s = Integer.toHexString(user*50);
-			if (s.length() == 1) {
-				s = "0"+s;
-			}
-			color.append(s);
+		sessionID = ui.getSession().getSession().getId();
+		if (lineContainer.getSessionColors().containsKey(sessionID)) {
+			color.append(lineContainer.getSessionColors().get(sessionID));
 		} else {
-			color.append("00");
+			if (user % 3 == 0) {
+				color.append("ff");
+			} else if (user % 2 == 0) {
+				String s = Integer.toHexString((user - (user % 3))*50);
+				if (s.length() == 1) {
+					s = "0"+s;
+				} else if (s.length() > 2) {
+					s = s.substring(0, 2);
+				}
+				color.append(s);
+			} else {
+				color.append("00");
+			}
+			
+			if (user % 3 == 0) {
+				color.append("00");
+			} else if (user % 2 == 0) {
+				color.append("ff");
+			} else {
+				String s = Integer.toHexString((user - (user % 3))*50);
+				if (s.length() == 1) {
+					s = "0"+s;
+				} else if (s.length() > 2) {
+					s = s.substring(0, 2);
+				}
+				color.append(s);
+			}
+			
+			if (user % 3 == 0) {
+				String s = Integer.toHexString((user - (user % 3))*50);
+				if (s.length() == 1) {
+					s = "0"+s;
+				} else if (s.length() > 2) {
+					s = s.substring(0, 2);
+				}
+				color.append(s);
+			} else if (user % 2 == 0) {
+				color.append("00");
+			} else {
+				color.append("ff");
+			}
+			
+			lineContainer.getSessionColors().put(sessionID, color.toString());
 		}
 		
-		if (user % 3 == 0) {
-			color.append("00");
-		} else if (user % 2 == 0) {
-			color.append("ff");
-		} else {
-			String s = Integer.toHexString(user*50);
-			if (s.length() == 1) {
-				s = "0"+s;
-			}
-			color.append(s);
-		}
-		
-		if (user % 3 == 0) {
-			String s = Integer.toHexString(user*50);
-			if (s.length() == 1) {
-				s = "0"+s;
-			}
-			color.append(s);
-		} else if (user % 2 == 0) {
-			color.append("00");
-		} else {
-			color.append("ff");
-		}
 		
 		System.out.println("Color for the line " + color.toString());
 		getState().color = color.toString();
@@ -113,7 +130,7 @@ public class CollabSketch extends com.vaadin.ui.AbstractComponent {
 		
 		System.out.println("Amount of lines " + lineContainer.getLines().size());
 		if (!lineContainer.getLines().isEmpty()) {
-			getState().lines = lineContainer.getLines();
+			getState().lines = (ArrayList<DrawLine>) lineContainer.getLines();
 		}
 		
 		lineContainer.getListeners().add(listener);
@@ -135,6 +152,7 @@ public class CollabSketch extends com.vaadin.ui.AbstractComponent {
 	@Override
 	public void detach() {
 		lineContainer.getListeners().remove(listener);
+		lineContainer.getSessionColors().remove(sessionID);
 		super.detach();
 	}
 }

@@ -2,22 +2,31 @@ package collabsketch;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import collabsketch.client.DrawLine;
 
 public class CollabSketchLineContainer implements Serializable {
 
-	private ArrayList<DrawLine> drawedLines = new ArrayList<DrawLine>();
+	private List<DrawLine> drawedLines = new ArrayList<DrawLine>();
 	
-	private HashSet<CollabSketchUpdateListener> listeners = new HashSet<CollabSketchUpdateListener>();
+	private Set<CollabSketchUpdateListener> listeners = new HashSet<CollabSketchUpdateListener>();
+	private Map<String, String> sessionColors = new HashMap<String, String>();
 	
-	public ArrayList<DrawLine> getLines() {
+	public List<DrawLine> getLines() {
 		return drawedLines;
 	}
 	
-	public HashSet<CollabSketchUpdateListener> getListeners() {
+	public Set<CollabSketchUpdateListener> getListeners() {
 		return listeners;
+	}
+	
+	public Map<String, String> getSessionColors() {
+		return sessionColors;
 	}
 	
 	public void canvasCleared(CollabSketchUpdateListener caller) {
