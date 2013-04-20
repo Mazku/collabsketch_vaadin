@@ -11,6 +11,8 @@ public class DrawLine implements Serializable {
 	
 	public List<DrawPoint> points = new ArrayList<DrawPoint>();
 	
+	public String color;
+	
 	public DrawLine() {
 	}
 	

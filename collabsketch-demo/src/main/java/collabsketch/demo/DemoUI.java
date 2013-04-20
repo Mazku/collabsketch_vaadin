@@ -25,8 +25,7 @@ public class DemoUI extends UI
     	
     	
     	// Initialize our new UI component
-    	final CollabSketch collabsketch = new CollabSketch(DemoUI.lines, this);
-    	collabsketch.setSizeFull();
+    	final CollabSketch collabsketch = new CollabSketch(DemoUI.lines, this, 800, 600);
     	
 		System.out.println("Demo application init");
 		

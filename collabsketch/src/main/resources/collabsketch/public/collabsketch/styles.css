@@ -4,9 +4,6 @@ div.collabsketch {
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
-}
-
-.canvas {
-	border-color: #FFFFFF;
-	border: 5px;
+	border-color: #000000;
+	/*border-width: 5px;*/
 }

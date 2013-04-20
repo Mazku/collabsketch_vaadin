@@ -1,6 +1,7 @@
 package collabsketch.client;
 
 
+import java.awt.Window;
 import java.util.ArrayList;
 
 import com.google.gwt.canvas.client.Canvas;
@@ -23,6 +24,7 @@ import com.google.gwt.event.dom.client.TouchMoveEvent;
 import com.google.gwt.event.dom.client.TouchMoveHandler;
 import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.dom.client.TouchStartHandler;
+import com.google.gwt.uibinder.client.UiConstructor;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 // Extend any GWT Widget
@@ -36,15 +38,19 @@ public class CollabSketchWidget extends VerticalPanel {
 	ArrayList<DrawPoint> points = new ArrayList<DrawPoint>();
 	final Canvas canv;
 	final Context2d context;
+	String color;
+	int lines;
 	
-	public CollabSketchWidget() {
+	public @UiConstructor CollabSketchWidget(int width, int height, String color) {
+		this.color = color;
+		setBorderWidth(10);
+		setSize(width + "px", height + "px");
+		
 		canv = Canvas.createIfSupported();
-		canv.addStyleName("canvas");
 		context = canv.getContext2d();
-		canv.setWidth("100%");
-		canv.setHeight("100%");
-		canv.setCoordinateSpaceHeight(800);
-		canv.setCoordinateSpaceWidth(800);
+		canv.setCoordinateSpaceWidth(width);
+		canv.setCoordinateSpaceHeight(height);
+		canv.setSize(width + "px", height + "px");
 		add(canv);
 		
 		canv.addMouseDownHandler(new MouseDownHandler() {
@@ -127,6 +133,7 @@ public class CollabSketchWidget extends VerticalPanel {
 		float y = clientY - canv.getAbsoluteTop();
 		context.beginPath();
 		context.setLineWidth(5);
+		context.setStrokeStyle(color);
 		context.moveTo(x, y);
 		points.add(new DrawPoint(x, y));
 		last_x = x;
@@ -155,10 +162,12 @@ public class CollabSketchWidget extends VerticalPanel {
 		DrawLine line = new DrawLine();
 		GWT.log("Sending line to server with " + points.size() + " points.");
 		line.addPoints(points);
+		line.color = color;
 		rpc.drawingEnded(line);
 		points.clear();
 		last_x = 0;
 		last_y = 0;
+		lines++;
 	}
 	
 	protected float getDistance(float x1, float y1, float x2, float y2) {
@@ -174,6 +183,7 @@ public class CollabSketchWidget extends VerticalPanel {
 		GWT.log("Drawing an existing line size " + line.points.size() + " into " + context);
 		context.beginPath();
 		context.setLineWidth(5);
+		context.setStrokeStyle(line.color);
 		boolean first = true;
 		for(DrawPoint point : line.points) {
 			if (first) {
@@ -183,14 +193,25 @@ public class CollabSketchWidget extends VerticalPanel {
 				GWT.log("Adding point at " + point.x + ", " + point.y);
 				context.lineTo(point.x, point.y);
 				context.moveTo(point.x, point.y);
-				context.stroke();
 			}
 		}
 		context.closePath();
+		context.stroke();
+		lines++;
 	}
 
 	public void clearCanvas() {
 		context.clearRect(0, 0, canv.getCoordinateSpaceWidth(), canv.getCoordinateSpaceHeight());
+	}
+
+	public void updateCanvasSize(int canvasWidth, int canvasHeight) {
+		canv.setCoordinateSpaceWidth(canvasWidth);
+		canv.setCoordinateSpaceHeight(canvasHeight);
+		canv.setSize(canvasWidth + "px", canvasHeight + "px");
+	}
+	
+	public void updateColor(String color) {
+		this.color = color;
 	}
 
 }

@@ -23,18 +23,10 @@ public class CollabSketchConnector extends AbstractComponentConnector {
 		
 		// To receive RPC events from server, we register ClientRpc implementation 
 		registerRpc(CollabSketchClientRpc.class, new CollabSketchClientRpc() {
-			public void alert(String message) {
-				Window.alert(message);
-			}
-
+			
 			@Override
 			public void drawLine(DrawLine line) {
 				getWidget().drawLine(line);
-			}
-
-			@Override
-			public void updateState() {
-				updateLines();
 			}
 
 			@Override
@@ -48,7 +40,7 @@ public class CollabSketchConnector extends AbstractComponentConnector {
 	// We must implement createWidget() to create correct type of widget
 	@Override
 	protected Widget createWidget() {
-		CollabSketchWidget widget = GWT.create(CollabSketchWidget.class);
+		CollabSketchWidget widget = new CollabSketchWidget(getState().canvasWidth, getState().canvasHeight, getState().color);
 		widget.addRpc(rpc);
 		return widget;
 	}
@@ -69,7 +61,15 @@ public class CollabSketchConnector extends AbstractComponentConnector {
 	@Override
 	public void onStateChanged(StateChangeEvent stateChangeEvent) {
 		super.onStateChanged(stateChangeEvent);
-		updateLines();
+		if (getState().canvasWidth != getWidget().canv.getCoordinateSpaceWidth() || getState().canvasHeight != getWidget().canv.getCoordinateSpaceHeight()) {
+			getWidget().updateCanvasSize(getState().canvasWidth, getState().canvasHeight);
+		}
+		if (!getState().color.equals(getWidget().color)) {
+			getWidget().updateColor(getState().color);
+		}
+		if (getState().lines.size() > getWidget().lines) {
+			updateLines();
+		}
 	}
 	
 	protected void updateLines() {

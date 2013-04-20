@@ -6,7 +6,7 @@ import collabsketch.client.DrawLine;
 
 public abstract class CollabSketchUpdateListener {
 
-	private UI ui;
+	private final UI ui;
 	
 	public CollabSketchUpdateListener(UI ui) {
 		this.ui = ui;
