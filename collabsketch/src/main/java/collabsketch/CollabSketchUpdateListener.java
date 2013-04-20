@@ -1,9 +1,22 @@
 package collabsketch;
 
+import com.vaadin.ui.UI;
+
 import collabsketch.client.DrawLine;
 
-public interface CollabSketchUpdateListener {
-	public void LineAdded(DrawLine line);
+public abstract class CollabSketchUpdateListener {
+
+	private UI ui;
 	
-	public void canvasCleared();
+	public CollabSketchUpdateListener(UI ui) {
+		this.ui = ui;
+	}
+	
+	public UI getUi() {
+		return ui;
+	}
+	
+	public abstract void lineAdded(DrawLine line);
+	
+	public abstract void canvasCleared();
 }

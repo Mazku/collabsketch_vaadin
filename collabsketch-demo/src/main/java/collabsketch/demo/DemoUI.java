@@ -18,14 +18,15 @@ import com.vaadin.ui.Button.ClickEvent;
 public class DemoUI extends UI
 {
 
-	static CollabSketchLineContainer lines = new CollabSketchLineContainer();
+	public static CollabSketchLineContainer lines = new CollabSketchLineContainer();
 	
     @Override
     protected void init(VaadinRequest request) {
     	
     	
     	// Initialize our new UI component
-    	final CollabSketch collabsketch = new CollabSketch(lines);
+    	final CollabSketch collabsketch = new CollabSketch(DemoUI.lines, this);
+    	collabsketch.setSizeFull();
     	
 		System.out.println("Demo application init");
 		

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Touch;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
@@ -14,12 +15,20 @@ import com.google.gwt.event.dom.client.MouseOutEvent;
 import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseUpHandler;
+import com.google.gwt.event.dom.client.TouchCancelEvent;
+import com.google.gwt.event.dom.client.TouchCancelHandler;
+import com.google.gwt.event.dom.client.TouchEndEvent;
+import com.google.gwt.event.dom.client.TouchEndHandler;
+import com.google.gwt.event.dom.client.TouchMoveEvent;
+import com.google.gwt.event.dom.client.TouchMoveHandler;
+import com.google.gwt.event.dom.client.TouchStartEvent;
+import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 // Extend any GWT Widget
 public class CollabSketchWidget extends VerticalPanel {
 	
-	boolean mouseDown = false;
+	boolean drawing = false;
 	float last_x = 0;
 	float last_y = 0;
 	private CollabSketchServerRpc rpc;
@@ -29,11 +38,11 @@ public class CollabSketchWidget extends VerticalPanel {
 	final Context2d context;
 	
 	public CollabSketchWidget() {
-
 		canv = Canvas.createIfSupported();
+		canv.addStyleName("canvas");
 		context = canv.getContext2d();
-		canv.setWidth("800px");
-		canv.setHeight("800px");
+		canv.setWidth("100%");
+		canv.setHeight("100%");
 		canv.setCoordinateSpaceHeight(800);
 		canv.setCoordinateSpaceWidth(800);
 		add(canv);
@@ -42,16 +51,7 @@ public class CollabSketchWidget extends VerticalPanel {
 			
 			@Override
 			public void onMouseDown(MouseDownEvent event) {
-				Context2d context = canv.getContext2d();
-				mouseDown = true;
-				float x = event.getClientX() - canv.getAbsoluteLeft();
-				float y = event.getClientY()  - canv.getAbsoluteTop();
-				context.beginPath();
-				context.setLineWidth(5);
-				context.moveTo(x, y);
-				points.add(new DrawPoint(x, y));
-				last_x = x;
-				last_y = y;
+				startDrawing(event.getClientX(), event.getClientY());
 			}
 		});
 		
@@ -59,19 +59,8 @@ public class CollabSketchWidget extends VerticalPanel {
 			
 			@Override
 			public void onMouseMove(MouseMoveEvent event) {
-				if (mouseDown) {
-					Context2d context = canv.getContext2d();
-					float x = event.getClientX() - canv.getAbsoluteLeft();
-					float y = event.getClientY() - canv.getAbsoluteTop();
-					
-					if (getDistance(last_x, last_y, x, y) > dist_buffer) {
-						context.lineTo(x, y);
-						context.moveTo(x, y);
-						points.add(new DrawPoint(x, y));
-						context.stroke();
-						last_x = x;
-						last_y = y;
-					}
+				if (drawing) {
+					continueDrawing(event.getClientX(), event.getClientY());
 				}
 			}
 		});
@@ -80,7 +69,7 @@ public class CollabSketchWidget extends VerticalPanel {
 			
 			@Override
 			public void onMouseOut(MouseOutEvent event) {
-				if (mouseDown) {
+				if (drawing) {
 					endDrawing();
 				}
 			}
@@ -90,26 +79,83 @@ public class CollabSketchWidget extends VerticalPanel {
 			
 			@Override
 			public void onMouseUp(MouseUpEvent event) {
-				if (mouseDown) {
+				if (drawing) {
 					endDrawing();
 				}
 			}
 		});
+		
+		canv.addTouchStartHandler(new TouchStartHandler() {
+			
+			@Override
+			public void onTouchStart(TouchStartEvent event) {
+				if (event.getTouches().length() == 1) {
+					Touch firstTouch = event.getTouches().get(0);
+					startDrawing(firstTouch.getClientX(), firstTouch.getClientY());
+				}
+			}
+		});
+		
+		canv.addTouchMoveHandler(new TouchMoveHandler() {
+			
+			@Override
+			public void onTouchMove(TouchMoveEvent event) {
+				if (drawing && event.getTouches().length() == 1) {
+					Touch firstTouch = event.getTouches().get(0);
+					continueDrawing(firstTouch.getClientX(), firstTouch.getClientY());
+					event.preventDefault();
+				}
+			}
+		});
+		
+		canv.addTouchEndHandler(new TouchEndHandler() {
+			
+			@Override
+			public void onTouchEnd(TouchEndEvent event) {
+				if (drawing) {
+					endDrawing();
+					event.preventDefault();
+				}
+			}
+		});
+	}
+
+	protected void startDrawing(int clientX, int clientY) {
+		Context2d context = canv.getContext2d();
+		drawing = true;
+		float x = clientX - canv.getAbsoluteLeft();
+		float y = clientY - canv.getAbsoluteTop();
+		context.beginPath();
+		context.setLineWidth(5);
+		context.moveTo(x, y);
+		points.add(new DrawPoint(x, y));
+		last_x = x;
+		last_y = y;
+	}
+	
+	private void continueDrawing(int clientX, int clientY) {
+		Context2d context = canv.getContext2d();
+		float x = clientX - canv.getAbsoluteLeft();
+		float y = clientY - canv.getAbsoluteTop();
+		
+		if (getDistance(last_x, last_y, x, y) > dist_buffer) {
+			context.lineTo(x, y);
+			context.moveTo(x, y);
+			points.add(new DrawPoint(x, y));
+			context.stroke();
+			last_x = x;
+			last_y = y;
+		}
 	}
 	
 	protected void endDrawing() {
-		mouseDown = false;
+		drawing = false;
 		Context2d context = canv.getContext2d();
 		context.closePath();
 		DrawLine line = new DrawLine();
 		GWT.log("Sending line to server with " + points.size() + " points.");
 		line.addPoints(points);
 		rpc.drawingEnded(line);
-		/*rpc.drawBegin(points.get(0));
-		for(DrawPoint point : points.subList(1, points.size() - 1)) {
-			rpc.drawPoint(point);
-		}
-		rpc.drawingEnd();*/
 		points.clear();
 		last_x = 0;
 		last_y = 0;
@@ -144,7 +190,6 @@ public class CollabSketchWidget extends VerticalPanel {
 	}
 
 	public void clearCanvas() {
-		canv.setWidth("800px");
 		context.clearRect(0, 0, canv.getCoordinateSpaceWidth(), canv.getCoordinateSpaceHeight());
 	}
 

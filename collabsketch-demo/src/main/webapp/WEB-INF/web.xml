@@ -19,6 +19,11 @@
             <param-name>widgetset</param-name>
             <param-value>collabsketch.demo.DemoWidgetSet</param-value>
         </init-param>
+        <init-param>
+            <param-name>pushmode</param-name>
+            <param-value>automatic</param-value>
+        </init-param>
+		<async-supported>true</async-supported>
     </servlet>
     <servlet-mapping>
         <servlet-name>VaadinServlet</servlet-name>
