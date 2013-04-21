@@ -3,6 +3,7 @@ package collabsketch;
 
 import java.util.ArrayList;
 
+import com.vaadin.server.ClientConnector.DetachEvent;
 import com.vaadin.ui.UI;
 
 import collabsketch.client.CollabSketchClientRpc;
@@ -27,6 +28,8 @@ public class CollabSketch extends com.vaadin.ui.AbstractComponent {
 	
 	final String sessionID; 
 	
+	final UI ui;
+	
 	
 	// To process events from the client, we implement ServerRpc
 	private CollabSketchServerRpc rpc = new CollabSketchServerRpc() {
@@ -47,18 +50,18 @@ public class CollabSketch extends com.vaadin.ui.AbstractComponent {
 	
 
 	public CollabSketch(CollabSketchLineContainer lineContainer, UI ui) {
-		this(lineContainer, ui, 800, 600);
+		this(lineContainer, 800, 600);
 	}
 
-	public CollabSketch(CollabSketchLineContainer lineContainer, UI ui, int width, int height) {
+	public CollabSketch(CollabSketchLineContainer lineContainer, int width, int height) {
 		this.lineContainer = lineContainer;
 		setImmediate(true);
 		getState().canvasWidth = width;
 		getState().canvasHeight = height;
 		
 		String color;
-		
-		sessionID = ui.getSession().getSession().getId();
+		ui = UI.getCurrent();
+		sessionID =  ui.getSession().getSession().getId();
 		if (lineContainer.getSessionColors().containsKey(sessionID)) {
 			color = lineContainer.getSessionColors().get(sessionID);
 		} else {
@@ -104,6 +107,16 @@ public class CollabSketch extends com.vaadin.ui.AbstractComponent {
 		}
 		
 		lineContainer.getListeners().put(sessionID, listener);
+
+		
+		ui.addDetachListener(new DetachListener() {
+			
+			@Override
+			public void detach(DetachEvent event) {
+				CollabSketch.this.lineContainer.getListeners().remove(listener);
+				CollabSketch.this.lineContainer.getSessionColors().remove(sessionID);
+			}
+		});
 	}
 	
 	// We must override getState() to cast the state to CollabSketchState
@@ -119,10 +132,4 @@ public class CollabSketch extends com.vaadin.ui.AbstractComponent {
 		lineContainer.canvasCleared(listener);
 	}
 	
-	@Override
-	public void detach() {
-		lineContainer.getListeners().remove(listener);
-		lineContainer.getSessionColors().remove(sessionID);
-		super.detach();
-	}
 }

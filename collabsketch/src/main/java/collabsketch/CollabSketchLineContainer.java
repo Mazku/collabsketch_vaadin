@@ -30,7 +30,7 @@ public class CollabSketchLineContainer implements Serializable {
 	}
 	
 	public void canvasCleared(CollabSketchUpdateListener caller) {
-		for (CollabSketchUpdateListener listener : listeners.values()) {
+		for (CollabSketchUpdateListener listener : new ArrayList<CollabSketchUpdateListener>(listeners.values())) {
 			if (!listener.equals(caller)) {
 				listener.canvasCleared();
 			}
@@ -38,7 +38,8 @@ public class CollabSketchLineContainer implements Serializable {
 	}
 	
 	public void lineDrawed(CollabSketchUpdateListener caller, DrawLine line) {
-		for (CollabSketchUpdateListener listener : listeners.values()) {
+		System.out.println("Drawing lines for " + listeners.size() + " listeners.");
+		for (CollabSketchUpdateListener listener : new ArrayList<CollabSketchUpdateListener>(listeners.values())) {
 			if (!listener.equals(caller)) {
 				listener.lineAdded(line);
 			}
