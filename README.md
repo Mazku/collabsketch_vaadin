@@ -16,6 +16,7 @@ This widget is in alpha state, but the main features:
 - Selecting the size of the canvas
 - Touch handling for mobile devices
 - Clearing the whole canvas
+- Feature to save image as file
 
 ### License & Author
 

@@ -15,9 +15,10 @@ import collabsketch.client.DrawPoint;
 // This is the server-side UI component that provides public API 
 // for CollabSketch
 public class CollabSketch extends com.vaadin.ui.AbstractComponent {
-	
+	private static final long serialVersionUID = 1L;
+
 	final static private String[] colors = new String[] {
-		"800000", "ff0000", "0000ff", "f472d0", "f0a30a", "6a00ff", 
+		"ff0000", "0000ff", "f472d0", "f0a30a", "6a00ff", "800000",
 		"76608a", "ffff00", "808000", "800080", "ff00ff", "00ff00", 
 		"008000", "000080", "00ffff", "008080", "a4c400", "ffa500"
 	};

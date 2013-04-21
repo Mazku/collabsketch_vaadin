@@ -8,6 +8,8 @@ import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Touch;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
@@ -24,6 +26,7 @@ import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.uibinder.client.UiConstructor;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 // Extend any GWT Widget
@@ -40,6 +43,7 @@ public class CollabSketchWidget extends VerticalPanel {
 	String color;
 	int lines;
 	long lastUpdate;
+	Button saveImage;
 	
 	public @UiConstructor CollabSketchWidget(int width, int height, String color) {
 		this.color = color;
@@ -123,6 +127,16 @@ public class CollabSketchWidget extends VerticalPanel {
 				}
 			}
 		});
+		
+		saveImage = new Button("Save as Image");
+		saveImage.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				Window.open(canv.toDataUrl("image/png"), "Image", "");
+			}
+		});
+		add(saveImage);
 	}
 
 	protected void startDrawing(int clientX, int clientY) {
