@@ -37,15 +37,8 @@ public class CollabSketch extends com.vaadin.ui.AbstractComponent {
 
 		@Override
 		public void drawingEnded(final DrawLine line) {
-			Thread thread = new Thread(new Runnable() {
-				
-				@Override
-				public void run() {
-					lineContainer.lineDrawed(listener, line);
-					lineContainer.getLines().add(line);
-				}
-			});
-			thread.start();
+			lineContainer.getLines().add(line);
+			lineContainer.lineDrawed(listener, line);
 		}
 	};
 	

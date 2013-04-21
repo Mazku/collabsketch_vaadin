@@ -29,20 +29,29 @@ public class CollabSketchLineContainer implements Serializable {
 		return sessionColors;
 	}
 	
-	public void canvasCleared(CollabSketchUpdateListener caller) {
-		for (CollabSketchUpdateListener listener : new ArrayList<CollabSketchUpdateListener>(listeners.values())) {
-			if (!listener.equals(caller)) {
-				listener.canvasCleared();
+	public void canvasCleared(final CollabSketchUpdateListener caller) {
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				for (CollabSketchUpdateListener listener : new ArrayList<CollabSketchUpdateListener>(listeners.values())) {
+					if (!listener.equals(caller)) {
+						listener.canvasCleared();
+					}
+				}
 			}
-		}
+		}).start();
 	}
 	
-	public void lineDrawed(CollabSketchUpdateListener caller, DrawLine line) {
-		System.out.println("Drawing lines for " + listeners.size() + " listeners.");
-		for (CollabSketchUpdateListener listener : new ArrayList<CollabSketchUpdateListener>(listeners.values())) {
-			if (!listener.equals(caller)) {
-				listener.lineAdded(line);
+	public void lineDrawed(final CollabSketchUpdateListener caller, final DrawLine line) {
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				for (CollabSketchUpdateListener listener : new ArrayList<CollabSketchUpdateListener>(listeners.values())) {
+					if (!listener.equals(caller)) {
+						listener.lineAdded(line);
+					}
+				}
 			}
-		}
+		}).start();
 	}
 }
