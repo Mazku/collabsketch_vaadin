@@ -5,7 +5,7 @@
 	<groupId>fi.mhsund</groupId>
 	<artifactId>collabsketch-demo</artifactId>
 	<packaging>war</packaging>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>CollabSketch Add-on Demo</name>
 
 	<properties>

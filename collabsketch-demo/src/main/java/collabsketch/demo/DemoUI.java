@@ -6,7 +6,6 @@ import collabsketch.CollabSketchLineContainer;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.server.VaadinRequest;
-import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -22,16 +21,9 @@ public class DemoUI extends UI
 	
     @Override
     protected void init(VaadinRequest request) {
-    	
-    	
-    	// Initialize our new UI component
     	final CollabSketch collabsketch = new CollabSketch(DemoUI.lines, 800, 600);
-    	
-		System.out.println("Demo application init");
 		
-    	// Show it in the middle of the screen
     	final VerticalLayout layout = new VerticalLayout();
-        layout.setStyleName("demoContentLayout");
         layout.setSizeFull();
         layout.addComponent(new Button("Reset canvas", new Button.ClickListener() {
 			
@@ -42,7 +34,6 @@ public class DemoUI extends UI
 		}));
         layout.addComponent(collabsketch);
         layout.setExpandRatio(collabsketch, 1.0f);
-        //layout.setComponentAlignment(collabsketch, Alignment.MIDDLE_CENTER);
         setContent(layout);
     }
 

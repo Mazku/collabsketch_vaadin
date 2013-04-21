@@ -5,7 +5,7 @@
 	<groupId>fi.mhsund</groupId>
 	<artifactId>collabsketch</artifactId>
 	<packaging>jar</packaging>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>CollabSketch Add-on</name>
 
 	<properties>
@@ -16,18 +16,18 @@
 		<!-- ZIP Manifest fields -->
 		<Implementation-Version>${project.version}</Implementation-Version>
 		<!-- Must not change this because of the Directory -->
-		<Implementation-Title>CollabSketch</Implementation-Title>
+		<Implementation-Title>${project.name}</Implementation-Title>
 		<Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
 		<Vaadin-License-Title>Apache License 2.0</Vaadin-License-Title>
-		<Vaadin-Addon>vaadin-${artifactId}-${project.version}.jar</Vaadin-Addon>
+		<Vaadin-Addon>${artifactId}-${project.version}.jar</Vaadin-Addon>
 	</properties>
 
-    <!--     
+        
 	<organization>
-		<name>My Name</name>
-		<url>https://github.com/mygithubaccount/CollabSketch/</url>
+		<name>Matias Sundberg</name>
+		<url>https://github.com/Mazku/CollabSketch/</url>
 	</organization>
-    
+    <!-- 
 	<scm>
 		<url>git://github.com/mygithubaccount/CollabSketch.git</url>
 		<connection>scm:git:git://github.com/mygithubaccount/CollabSketch.git</connection>
