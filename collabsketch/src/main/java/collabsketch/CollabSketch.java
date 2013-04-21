@@ -71,8 +71,6 @@ public class CollabSketch extends com.vaadin.ui.AbstractComponent {
 			lineContainer.getSessionColors().put(sessionID, color.toString());
 		}
 		
-		
-		System.out.println("Color for the line " + color.toString());
 		getState().color = color;
 		listener = new CollabSketchUpdateListener(ui) {
 				
@@ -101,9 +99,6 @@ public class CollabSketch extends com.vaadin.ui.AbstractComponent {
 		
 		// To receive events from the client, we register ServerRpc
 		registerRpc(rpc);
-		System.out.println("Collab component created!");
-		
-		System.out.println("Amount of lines " + lineContainer.getLines().size());
 		if (!lineContainer.getLines().isEmpty()) {
 			getState().lines = (ArrayList<DrawLine>) lineContainer.getLines();
 		}

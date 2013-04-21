@@ -1,4 +1,4 @@
-# Collaborative Sketch for Vaadin
+# Collaborative Sketch Canvas for Vaadin
 
 The widget draws the same collaborative sketching canvas for multiple users and each of them will be assigned with their own color. When anyone of the users edit the sketch its automaticly pushed for all the other users.
 

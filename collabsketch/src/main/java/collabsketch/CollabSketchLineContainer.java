@@ -38,7 +38,6 @@ public class CollabSketchLineContainer implements Serializable {
 	}
 	
 	public void lineDrawed(CollabSketchUpdateListener caller, DrawLine line) {
-		System.out.println("Line drawed, calling " + listeners.size() + " listeners.");
 		for (CollabSketchUpdateListener listener : listeners.values()) {
 			if (!listener.equals(caller)) {
 				listener.lineAdded(line);

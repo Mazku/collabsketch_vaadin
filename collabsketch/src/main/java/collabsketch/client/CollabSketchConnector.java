@@ -73,7 +73,6 @@ public class CollabSketchConnector extends AbstractComponentConnector {
 	}
 	
 	protected void updateLines() {
-		GWT.log("Updating existing lines");
 		if (!getState().lines.isEmpty()) {
 			for (DrawLine line : getState().lines) {
 				getWidget().drawLine(line);

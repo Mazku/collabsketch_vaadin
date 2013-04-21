@@ -126,7 +126,6 @@ public class CollabSketchWidget extends VerticalPanel {
 	}
 
 	protected void startDrawing(int clientX, int clientY) {
-		Context2d context = canv.getContext2d();
 		drawing = true;
 		float x = clientX - canv.getAbsoluteLeft() + Window.getScrollLeft();
 		float y = clientY - canv.getAbsoluteTop() + Window.getScrollTop();
@@ -162,7 +161,6 @@ public class CollabSketchWidget extends VerticalPanel {
 	protected void endDrawing() {
 		drawing = false;
 		DrawLine line = new DrawLine();
-		GWT.log("Sending line to server with " + points.size() + " points.");
 		line.addPoints(points);
 		line.color = color;
 		rpc.drawingEnded(line);
@@ -183,7 +181,6 @@ public class CollabSketchWidget extends VerticalPanel {
 
 	public void drawLine(DrawLine line) {
 		Context2d context = canv.getContext2d();
-		GWT.log("Drawing an existing line size " + line.points.size() + " into " + context);
 		context.beginPath();
 		context.setLineWidth(5);
 		context.setStrokeStyle(line.color);
@@ -193,7 +190,6 @@ public class CollabSketchWidget extends VerticalPanel {
 				context.moveTo(point.x, point.y);
 				first = false;
 			} else {
-				GWT.log("Adding point at " + point.x + ", " + point.y);
 				context.lineTo(point.x, point.y);
 				context.moveTo(point.x, point.y);
 			}
